@@ -11,8 +11,15 @@ global pysnotInstallFolder
 pysnotInstallFolder = '/home/jonesc/pySNOt/'
 
 global pysnotAnalysisFolder
-pysnotAnalysisFolder = pysnotInstallFolder + str('analysisScripts/') 
-#global ratInstallFolder 
+pysnotAnalysisFolder = pysnotInstallFolder + str('analysisScripts/')
+
+global ratEnvFile
+ratEnvFile = str('/home/jonesc/env_rat-dev.sh')
+
+global ratFolder
+ratFolder = str('/home/jonesc/rat/')
+
+##global submissionScriptFolder = 
 
 
 class analyscript:
@@ -33,11 +40,13 @@ class analyscript:
         os.system('mkdir ' + str(scriptFolder))
  
         scriptFile = open(scriptFilePath,'w')
-        scriptFile.write('g++ -Wall `root-config --cflags --glibs` -o '+ str(self.scriptName) + ' -Iinclude -I/home/jonesc/rat/include -Iinclude/RAT -I/home/jonesc/rat/include/RAT -I/home/jonesc/rat/include/RAT/DS -L/home/jonesc/rat/lib -lHistPainter  -lRATEvent_Linux ' + str(pysnotAnalysisFolder) + str(self.scriptName) +'.C')
+        scriptFile.write('g++ -Wall `root-config --cflags --glibs` -o '+ str(self.scriptName) + ' -Iinclude -I' +str(ratFolder)+ 'include -Iinclude/RAT -I'+str(ratFolder)+'include/RAT -I'+str(ratFolder)+'include/RAT/DS -L'+str(ratFolder)+'lib -lHistPainter  -lRATEvent_Linux ' + str(pysnotAnalysisFolder) + str(self.scriptName) +'.C')
         scriptFile.close()
         
         scriptID = self.scriptName + str(int(time.time()))
-        submissionScriptFolder = '/home/jonesc/batch/pysnot/'
+        #submissionScriptFolder = '/home/jonesc/batch/pysnot/'
+
+        submissionScriptFolder = '/home/jonesc/pySNOt/batch/'
         submissionScriptFile = str(submissionScriptFolder) +str(scriptID) + '.sh'
         
         #Test to see if the submissionScriptFolder still exsists
@@ -49,7 +58,7 @@ class analyscript:
         
         print str(self.scriptName)
         submissionScript = open(submissionScriptFile,'w')
-        submissionScript.write(' #!/bin/bash \n source /home/jonesc/env_rat-dev.sh \n\n cd ' + str(scriptFolder) + '\n ./' + str(self.scriptName))
+        submissionScript.write(' #!/bin/bash \n source ' + str(ratEnvFile)+ ' \n\n cd ' + str(scriptFolder) + '\n ./' + str(self.scriptName))
         submissionScript.close()
         
         ##Source the analysis submission script
