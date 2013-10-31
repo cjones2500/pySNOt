@@ -19,14 +19,17 @@ ratEnvFile = str('/home/jonesc/env_rat-dev.sh')
 global ratFolder
 ratFolder = str('/home/jonesc/rat/')
 
-##global submissionScriptFolder = 
-
+global submissionScriptFolder 
+submissionScriptFolder = str('/home/jonesc/pySNOt/batch/')
 
 class analyscript:
 
     def __init__(self,batchTime,scriptName):
         self.batchTime = batchTime
-        self.scriptName = scriptName        
+        self.scriptName = scriptName  
+        
+    #def setTitle(self):
+        
         
     def submit(self):
         print "Submit to batch for " + str(self.batchTime) + " ! \n"
@@ -44,9 +47,7 @@ class analyscript:
         scriptFile.close()
         
         scriptID = self.scriptName + str(int(time.time()))
-        #submissionScriptFolder = '/home/jonesc/batch/pysnot/'
 
-        submissionScriptFolder = '/home/jonesc/pySNOt/batch/'
         submissionScriptFile = str(submissionScriptFolder) +str(scriptID) + '.sh'
         
         #Test to see if the submissionScriptFolder still exsists
@@ -73,4 +74,4 @@ class analyscript:
         else:
             batchCmd = 'qsub -l cput=' + self.batchTime + ' ' +str(submissionScriptFile)
         
-        print batchCmd
+        os.system(batchCmd)
