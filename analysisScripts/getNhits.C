@@ -8,38 +8,18 @@
 #include <fstream>
 #include <vector>
 #include <TMath.h>
+#include <string>
 #include "Root.hh"
 #include "Run.hh"
 #include "EV.hh"
 #include "MC.hh"
 #include <string>
-void GetNhitsInWindow(char* pFile, TH1D* hist);
-void NhitSpectrum(char* inputFile, char* outputFile,double setXMinValue,double setXMaxValue,double setYMinValue,double setYMaxValue,double xbinWidth,char* xTitle,char* yTitle)
-{
-  
-  double doubleNumBins = (setXMaxValue-setXMinValue)/xbinWidth; //Calculate the number of bins as standard
-  Int_t numBins = (Int_t) doubleNumBins; //Calculate the number of bins as an integer value
 
-  TCanvas *c1=new TCanvas("c1");
+/* DO NOT REMOVE - This is a standard Member of pySNOT */
+void MakeGraph(char* inputFile, char* outputFile,double setXMinValue,double setXMaxValue,double setYMinValue,double setYMaxValue,double xbinWidth,char* graphTitle,char* xTitle,char* yTitle);
 
-  /********* Stitching the title names together */ 
-  //char* graphTitle = ";";
-  //char* graphPlusXTitle = str::strcat(graphTitle,xTitle);
-  //char* allTitles = str::strcat(graphPlusXTitle,yTitle); 
-  char* allTitles = ";";
 
-  TH1D* histogram = new TH1D("pySNOt",allTitles,numBins,setXMinValue,setXMaxValue);
-
-  GetNhitsInWindow(inputFile,histogram);
-  histogram->SetLineColor(1);
-  histogram->SetStats(0);
-  histogram->SetMaximum(setYMaxValue);
-  histogram->Draw();
-  c1->Update();
-  c1->SaveAs(outputFile);
-
-}
-
+/* Place Customised functions here */
 void GetNhitsInWindow(char* pFile, TH1D* hist){
   TFile *file = new TFile(pFile);
   TTree *tree = (TTree *)file->Get("T");
@@ -62,10 +42,53 @@ void GetNhitsInWindow(char* pFile, TH1D* hist){
     }
 }
 
+
+
+/* DO NOT REMOVE - This is a standard Member of pySNOT */
 int main(int argc, char* argv[])
 {
-  NhitSpectrum("/data/snoplus/jonesc/batch_output/C14/C14.root","/data/snoplus/jonesc/batch_output/C14/output.root",0.0,1000.0,0,1500,10,"xtitle","ytitle");	
+  std::cout << "Checking the Inputs" << std::endl;
+  std::cout << "Input File:" << std::endl;
+  std::cout << argv[1] << std::endl;
+  std::cout << "Output File:" << std::endl;
+  std::cout << argv[2] << std::endl;
+  std::cout << "Graph Title" << std::endl;
+  std::cout << argv[3] << std::endl;
+  std::cout << "X Axis Title" << std::endl;
+  std::cout << argv[4] << std::endl;
+  std::cout << "y Axis Title" << std::endl;
+  std::cout << argv[5] << std::endl;
+
+  MakeGraph(argv[1],argv[2],0.0,1000.0,0,1500,10,argv[3],argv[4],argv[5]);	
 }
 
+/* DO NOT REMOVE - This is a standard Member of pySNOT */
+void MakeGraph(char* inputFile, char* outputFile,double setXMinValue,double setXMaxValue,double setYMinValue,double setYMaxValue,double xbinWidth,char* graphTitle,char* xTitle,char* yTitle)
+{
+  
+  double doubleNumBins = (setXMaxValue-setXMinValue)/xbinWidth; //Calculate the number of bins as standard
+  Int_t numBins = (Int_t) doubleNumBins; //Calculate the number of bins as an integer value
+
+  TCanvas *c1=new TCanvas("c1");
+
+  /*This is required to make the Graph */
+  char result[100];
+  strcpy(result,graphTitle); //Copy graphTitle into the result string
+  strcat(result,";");        //Append extra char* variables to this string 
+  strcat(result,xTitle);
+  strcat(result,";");
+  strcat(result,yTitle);
+  
+  std::cout << "title axis " << result << std::endl;
+  TH1D* histogram = new TH1D("pySNOt",result,numBins,setXMinValue,setXMaxValue);
+
+  GetNhitsInWindow(inputFile,histogram);
+  histogram->SetLineColor(1);
+  histogram->SetStats(0);
+  histogram->SetMaximum(setYMaxValue);
+  histogram->Draw();
+  c1->Update();
+  c1->SaveAs(outputFile);
+}
 
 

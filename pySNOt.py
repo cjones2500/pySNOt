@@ -22,14 +22,27 @@ ratFolder = str('/home/jonesc/rat/')
 global submissionScriptFolder 
 submissionScriptFolder = str('/home/jonesc/pySNOt/batch/')
 
+
 class analyscript:
 
-    def __init__(self,batchTime,scriptName):
+    def __init__(self,batchTime,scriptName,inputFile,outputFile):
+        ## Need default behaviour in case these are undefined
         self.batchTime = batchTime
-        self.scriptName = scriptName  
+        self.scriptName = scriptName
+        self.inputFile = inputFile
+        self.outputFile = outputFile
         
-    #def setTitle(self):
-        
+    def setTitle(self,graphTitle):
+        self.graphTitle = str(graphTitle)
+        self.graphTitle = str(self.graphTitle).replace(" ","")
+    
+    def setxaxis(self,xAxisTitle):
+        self.xAxisTitle = str(xAxisTitle)
+        self.xAxisTitle = str(self.xAxisTitle).replace(" ","")
+
+    def setyaxis(self,yAxisTitle):
+        self.yAxisTitle = str(yAxisTitle)
+        self.yAxisTitle = str(self.yAxisTitle).replace(" ","")
         
     def submit(self):
         print "Submit to batch for " + str(self.batchTime) + " ! \n"
@@ -46,7 +59,7 @@ class analyscript:
         scriptFile.write('g++ -Wall `root-config --cflags --glibs` -o '+ str(self.scriptName) + ' -Iinclude -I' +str(ratFolder)+ 'include -Iinclude/RAT -I'+str(ratFolder)+'include/RAT -I'+str(ratFolder)+'include/RAT/DS -L'+str(ratFolder)+'lib -lHistPainter  -lRATEvent_Linux ' + str(pysnotAnalysisFolder) + str(self.scriptName) +'.C')
         scriptFile.close()
         
-        scriptID = self.scriptName + str(int(time.time()))
+        scriptID = self.scriptName + "_" +str(int(time.time()))
 
         submissionScriptFile = str(submissionScriptFolder) +str(scriptID) + '.sh'
         
@@ -57,9 +70,8 @@ class analyscript:
         else:
             os.system('mkdir '+str(submissionScriptFolder))
         
-        print str(self.scriptName)
         submissionScript = open(submissionScriptFile,'w')
-        submissionScript.write(' #!/bin/bash \n source ' + str(ratEnvFile)+ ' \n\n cd ' + str(scriptFolder) + '\n ./' + str(self.scriptName))
+        submissionScript.write(' #!/bin/bash \n source ' + str(ratEnvFile)+ ' \n\n cd ' + str(scriptFolder) + '\n ./' + str(self.scriptName) + ' ' + str(self.inputFile) + ' ' + str(self.outputFile)+ ' ' + str(self.graphTitle) + ' ' + str(self.xAxisTitle) + ' ' + str(self.yAxisTitle))
         submissionScript.close()
         
         ##Source the analysis submission script
