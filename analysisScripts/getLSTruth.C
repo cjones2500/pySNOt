@@ -38,7 +38,15 @@ void GetNhitsInWindow(char* pFile, TH1D* hist){
       if( eventCounter == 0 ) continue;
       RAT::DS::EV *pev= rds->GetEV(0);
       Int_t PMThits = pev->GetPMTCalCount();
-      hist->Fill(PMThits);
+      for(int ipmt=0;ipmt<PMThits;++ipmt){
+
+        //Retrieve the PMTTruth Information for QHS vs QHL
+        RAT::DS::PMTTruth *PMT = pev->GetPMTTruth(ipmt);
+        double_t qhs = PMT->GetsQHS();                                   
+        double_t qhl = PMT->GetsQHL();                
+        double_t ratio = qhs/qhl;
+        hist->Fill(ratio);
+      }
     }
 }
 
@@ -81,8 +89,7 @@ int main(int argc, char* argv[])
   std::cout << "pySNOt::yHigh" << std::endl;
   std::cout << argv[10] << std::endl;
 
-  MakeGraph(argv[1],argv[2],xMin,xMax,yMin,yMax,xWidth,argv[3],argv[4],argv[5]);
-	
+  MakeGraph(argv[1],argv[2],xMin,xMax,yMin,yMax,xWidth,argv[3],argv[4],argv[5]);	
 }
 
 /* DO NOT REMOVE - This is a standard Member of pySNOT */
@@ -101,13 +108,13 @@ void MakeGraph(char* inputFile, char* outputFile,double setXMinValue,double setX
   strcat(result,xTitle);
   strcat(result,";");
   strcat(result,yTitle);
- 
+  
+  std::cout << "title axis " << result << std::endl;
   TH1D* histogram = new TH1D("pySNOt",result,numBins,setXMinValue,setXMaxValue);
 
   GetNhitsInWindow(inputFile,histogram);
   histogram->SetLineColor(1);
   histogram->SetStats(0);
-  histogram->SetMinimum(setYMinValue);
   if(setYMaxValue <= 0.0){
     //Let the Maximum Value of Y be automatically set
   }
@@ -115,6 +122,7 @@ void MakeGraph(char* inputFile, char* outputFile,double setXMinValue,double setX
     //Manually set the Maximum Value of Y
     histogram->SetMaximum(setYMaxValue);
   }
+  histogram->SetMaximum(setYMaxValue);
   histogram->Draw();
   c1->Update();
   c1->SaveAs(outputFile);
