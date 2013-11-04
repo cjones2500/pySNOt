@@ -36,14 +36,19 @@ class analyscript:
         self.graphTitle = str(graphTitle)
         self.graphTitle = str(self.graphTitle).replace(" ","")
     
-    def setxaxis(self,xAxisTitle):
+    def setxaxis(self,xAxisTitle,xLow,xHigh,xBinWidth):
         self.xAxisTitle = str(xAxisTitle)
         self.xAxisTitle = str(self.xAxisTitle).replace(" ","")
+        self.xLow = str(xLow)
+        self.xHigh = str(xHigh)
+        self.xBinWidth = str(xBinWidth)
 
-    def setyaxis(self,yAxisTitle):
+    def setyaxis(self,yAxisTitle,yLow,yHigh):
         self.yAxisTitle = str(yAxisTitle)
         self.yAxisTitle = str(self.yAxisTitle).replace(" ","")
-        
+        self.yLow = str(yLow)
+        self.yHigh = str(yHigh)
+    
     def submit(self):
         print "Submit to batch for " + str(self.batchTime) + " ! \n"
 
@@ -71,7 +76,7 @@ class analyscript:
             os.system('mkdir '+str(submissionScriptFolder))
         
         submissionScript = open(submissionScriptFile,'w')
-        submissionScript.write(' #!/bin/bash \n source ' + str(ratEnvFile)+ ' \n\n cd ' + str(scriptFolder) + '\n ./' + str(self.scriptName) + ' ' + str(self.inputFile) + ' ' + str(self.outputFile)+ ' ' + str(self.graphTitle) + ' ' + str(self.xAxisTitle) + ' ' + str(self.yAxisTitle))
+        submissionScript.write(' #!/bin/bash \n source ' + str(ratEnvFile)+ ' \n\n cd ' + str(scriptFolder) + '\n ./' + str(self.scriptName) + ' ' + str(self.inputFile) + ' ' + str(self.outputFile)+ ' ' + str(self.graphTitle) + ' ' + str(self.xAxisTitle) + ' ' + str(self.yAxisTitle) + ' ' + str(self.xLow) + ' ' + str(self.xHigh) + ' '+ str(self.xBinWidth) + ' ' + str(self.yLow) + ' ' +str(self.yHigh))
         submissionScript.close()
         
         ##Source the analysis submission script

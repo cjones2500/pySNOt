@@ -47,19 +47,48 @@ void GetNhitsInWindow(char* pFile, TH1D* hist){
 /* DO NOT REMOVE - This is a standard Member of pySNOT */
 int main(int argc, char* argv[])
 {
-  std::cout << "Checking the Inputs" << std::endl;
-  std::cout << "Input File:" << std::endl;
-  std::cout << argv[1] << std::endl;
-  std::cout << "Output File:" << std::endl;
-  std::cout << argv[2] << std::endl;
-  std::cout << "Graph Title" << std::endl;
-  std::cout << argv[3] << std::endl;
-  std::cout << "X Axis Title" << std::endl;
-  std::cout << argv[4] << std::endl;
-  std::cout << "y Axis Title" << std::endl;
-  std::cout << argv[5] << std::endl;
+  /*double xMin = atof(argv[6]);
+  double xMax = atof(argv[7]);
+  double xWidth = atof(argv[8]);
+  double yMin = atof(argv[9]);
+  double yMax = atof(argv[10]);*/
+  
+  double xMin ;
+  double xMax ;
+  double xWidth ;
+  double yMin ;
+  double yMax ;
+  
+  xMin = strtod(argv[6],NULL);
+  xMax = strtod(argv[7],NULL);
+  xWidth = strtod(argv[8],NULL);
+  yMin = strtod(argv[9],NULL);
+  yMax = strtod(argv[10],NULL);
 
-  MakeGraph(argv[1],argv[2],0.0,1000.0,0,1500,10,argv[3],argv[4],argv[5]);	
+  std::cout << "pySNOt::Checking the Inputs" << std::endl;
+  std::cout << "pySNOt::Input File" << std::endl;
+  std::cout << argv[1] << std::endl;
+  std::cout << "pySNOt::Output File" << std::endl;
+  std::cout << argv[2] << std::endl;
+  std::cout << "pySNOt::Graph Title" << std::endl;
+  std::cout << argv[3] << std::endl;
+  std::cout << "pySNOt::X Axis Title" << std::endl;
+  std::cout << argv[4] << std::endl;
+  std::cout << "pySNOt::y Axis Title" << std::endl;
+  std::cout << argv[5] << std::endl;
+  std::cout << "pySNOt::xLow" << std::endl;
+  std::cout << xMin << std::endl;
+  std::cout << "pySNOt::xHigh" << std::endl;
+  std::cout << xMax << std::endl;
+  std::cout << "pySNOt::xBinWidth" << std::endl;
+  std::cout << argv[8] << std::endl;
+  std::cout << "pySNOt::yLow" << std::endl;
+  std::cout << argv[9] << std::endl;
+  std::cout << "pySNOt::yHigh" << std::endl;
+  std::cout << argv[10] << std::endl;
+
+  MakeGraph(argv[1],argv[2],xMin,xMax,yMin,yMax,xWidth,argv[3],argv[4],argv[5]);
+	
 }
 
 /* DO NOT REMOVE - This is a standard Member of pySNOT */
@@ -78,13 +107,13 @@ void MakeGraph(char* inputFile, char* outputFile,double setXMinValue,double setX
   strcat(result,xTitle);
   strcat(result,";");
   strcat(result,yTitle);
-  
-  std::cout << "title axis " << result << std::endl;
+ 
   TH1D* histogram = new TH1D("pySNOt",result,numBins,setXMinValue,setXMaxValue);
 
   GetNhitsInWindow(inputFile,histogram);
   histogram->SetLineColor(1);
   histogram->SetStats(0);
+  histogram->SetMinimum(setYMinValue);
   histogram->SetMaximum(setYMaxValue);
   histogram->Draw();
   c1->Update();
