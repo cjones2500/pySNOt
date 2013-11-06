@@ -32,13 +32,31 @@ void GetNhitsInWindow(char* pFile, TH1D* hist){
   runtree->SetBranchAddress("run", &pmtds);
   runtree->GetEntry();
   
+  
   for(int iLoop =0; iLoop < tree->GetEntries() ; iLoop++ ){
     tree->GetEntry( iLoop ); 
       int eventCounter = rds->GetEVCount();
       if( eventCounter == 0 ) continue;
       RAT::DS::EV *pev= rds->GetEV(0);
       Int_t PMThits = pev->GetPMTCalCount();
-      hist->Fill(PMThits);
+      int doubleCounter = 0;
+
+      for(int ipmt=0;ipmt<PMThits;++ipmt){
+        //Retrieve the PMTTruth Information for QHS vs QHL
+        RAT::DS::PMTCal *PMTCal = pev->GetPMTCal(ipmt);
+        double_t qhs = PMTCal->GetsQHS();                                   
+        double_t qhl = PMTCal->GetsQHL();                
+	
+	//Check to see if a PMT has been double hit
+	if(qhl > qhs){
+	  doubleCounter = doubleCounter + 1;
+	}
+	
+      }//end of looping over all the PMTs in a given event
+      
+      hist->Fill(doubleCounter);
+      std::cout << "Number of PMTs hit:" << PMThits << " Number of doubleCounts: " << doubleCounter << std::endl;
+      
     }
 }
 
@@ -81,8 +99,7 @@ int main(int argc, char* argv[])
   std::cout << "pySNOt::yHigh" << std::endl;
   std::cout << argv[10] << std::endl;
 
-  MakeGraph(argv[1],argv[2],xMin,xMax,yMin,yMax,xWidth,argv[3],argv[4],argv[5]);
-	
+  MakeGraph(argv[1],argv[2],xMin,xMax,yMin,yMax,xWidth,argv[3],argv[4],argv[5]);	
 }
 
 /* DO NOT REMOVE - This is a standard Member of pySNOT */
@@ -101,20 +118,13 @@ void MakeGraph(char* inputFile, char* outputFile,double setXMinValue,double setX
   strcat(result,xTitle);
   strcat(result,";");
   strcat(result,yTitle);
- 
+  
   TH1D* histogram = new TH1D("pySNOt",result,numBins,setXMinValue,setXMaxValue);
 
   GetNhitsInWindow(inputFile,histogram);
   histogram->SetLineColor(1);
   histogram->SetStats(0);
-  //histogram->SetMinimum(setYMinValue);
-  /* if(setYMaxValue <= 0.0){
-    //Let the Maximum Value of Y be automatically set
-  }
-  else{
-    //Manually set the Maximum Value of Y
-    histogram->SetMaximum(setYMaxValue);
-    }*/
+  //histogram->SetMaximum(setYMaxValue);
   histogram->Draw();
   c1->Update();
   c1->SaveAs(outputFile);
